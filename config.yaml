@@ -1,0 +1,10 @@
+# basic setting parameters
+clip_length: 1.0 # [sec]
+
+# preprocessing parameters
+sample_rate: 44100
+hop_length: 441
+n_fft: 1024
+n_mels: 64
+f_min: 0
+f_max: 22050
