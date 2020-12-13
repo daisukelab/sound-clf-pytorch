@@ -40,7 +40,7 @@ If we need to augment input data in time-domain, we feed raw audio to dataset cl
 But in this example, all the data are converted to log-mel spectrogram in advance, as a major choice.
 
 - Good: This will make data handling easy, especially in training pipeline.
-- Bad: Data augmentation will be limited. Available transforations in torchaudio are: [FrequencyMasking](https://pytorch.org/audio/stable/transforms.html#frequencymasking) or [TimeMasking](https://pytorch.org/audio/stable/transforms.html#timemasking).
+- Bad: Applicable data augmentations will be limited. Available transformations in torchaudio are: [FrequencyMasking](https://pytorch.org/audio/stable/transforms.html#frequencymasking) or [TimeMasking](https://pytorch.org/audio/stable/transforms.html#timemasking).
 
 ### Input data size
 
