@@ -31,7 +31,35 @@ It's about accuracy ~0.7, far away from the competitive accuracy ~0.95 you can f
 
 You can try many techniques based on this simple tutorial, so I'd keep things simple here.
 
-## What can happen in the future
+## Notes for design choices
 
-Following examples for getting better results.
+### Input data format: raw audio or spectrogram?
+
+If we need to augment input data in time-domain, we feed raw audio to dataset class.
+
+But in this example, all the data are converted to log-mel spectrogram in advance, as a major choice.
+
+- Good: This will make data handling easy, especially in training pipeline.
+- Bad: Data augmentation will be limited. Available transforations in torchaudio are: [FrequencyMasking](https://pytorch.org/audio/stable/transforms.html#frequencymasking) or [TimeMasking](https://pytorch.org/audio/stable/transforms.html#timemasking).
+
+### Input data size
+
+Number of frequency bins (n_mels) is set to 64 as a typical choice.
+Duration is set to 1 second, just as an example.
+
+You can find and change in [config.yaml](config.yaml).
+
+    clip_length: 1.0 # [sec]
+    n_mels: 64
+
+### FFT paramaters
+
+Typical paramaters are configured in [config.yaml](config.yaml).
+
+    sample_rate: 44100
+    hop_length: 441
+    n_fft: 1024
+    n_mels: 64
+    f_min: 0
+    f_max: 22050
 
