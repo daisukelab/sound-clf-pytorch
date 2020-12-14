@@ -1,15 +1,15 @@
 # Sound Classifier Tutorial for PyTorch
 
-This is a sound classifier tutorial based on PyTorch, PyTorch Lightning and torchaudio.
+This is a sound classifier tutorial using PyTorch, PyTorch Lightning and torchaudio.
 
 ## Motivation
 
-I had made a repository for sound classifier [Machine Learning Sound Classifier for Live Audio](https://github.com/daisukelab/ml-sound-classifier),
-it is based on my solution for the Kaggle competition "[Freesound General-Purpose Audio Tagging Challenge](https://www.kaggle.com/c/freesound-audio-tagging)" with Keras.
+I had made a repository regarding sound classifier solution: [Machine Learning Sound Classifier for Live Audio](https://github.com/daisukelab/ml-sound-classifier),
+it is based on my solution for a Kaggle competition "[Freesound General-Purpose Audio Tagging Challenge](https://www.kaggle.com/c/freesound-audio-tagging)" using Keras.
 
-Now many people are using PyTorch, and yes, I'm also the one.
+Keras was popular when it was created, but many people today are using PyTorch, and yes, I'm also the one.
 
-This repository shows a quick example for how I would try new sound machine learning competition with current software assets.
+This repository is an updated example solution using PyTorch that shows how I would try new machine learning sound competition with current software assets.
 
 ## Quickstart
 
@@ -22,7 +22,7 @@ This repository shows a quick example for how I would try new sound machine lear
 - A training example: [Training-Classifier.ipynb](Training-Classifier.ipynb)
 - [FSDKaggle2018](https://zenodo.org/record/2552860#.X9TH6mT7RzU) handling example, it's a sound multi-class classification task.
 
-It's about accuracy ~0.7, far away from the competitive accuracy ~0.95 you can find here: [Kaggle top solutions](https://www.kaggle.com/c/freesound-audio-tagging/leaderboard).
+It results in accuracy about ~0.7, far away from the competitive accuracy ~0.95 you can find here: [Kaggle top solutions](https://www.kaggle.com/c/freesound-audio-tagging/leaderboard).
 
 ## What's not
 
