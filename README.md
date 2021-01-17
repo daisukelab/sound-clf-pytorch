@@ -1,15 +1,15 @@
 # Sound Classifier Tutorial for PyTorch
 
-This is a sound classifier tutorial based on PyTorch, PyTorch Lightning and torchaudio.
+This is a sound classifier tutorial using PyTorch, PyTorch Lightning and torchaudio.
 
 ## Motivation
 
-I had made a repository for sound classifier [Machine Learning Sound Classifier for Live Audio](https://github.com/daisukelab/ml-sound-classifier),
-it is based on my solution for the Kaggle competition "[Freesound General-Purpose Audio Tagging Challenge](https://www.kaggle.com/c/freesound-audio-tagging)" with Keras.
+I had made a repository regarding sound classifier solution: [Machine Learning Sound Classifier for Live Audio](https://github.com/daisukelab/ml-sound-classifier),
+it is based on my solution for a Kaggle competition "[Freesound General-Purpose Audio Tagging Challenge](https://www.kaggle.com/c/freesound-audio-tagging)" using Keras.
 
-Now many people are using PyTorch, and yes, I'm also the one.
+Keras was popular when it was created, but many people today are using PyTorch, and yes, I'm also the one.
 
-This repository shows a quick example for how I would try new sound machine learning competition with current software assets.
+This repository is an updated example solution using PyTorch that shows how I would try new machine learning sound competition with current software assets.
 
 ## Quickstart
 
@@ -44,7 +44,7 @@ If we need to augment input data in time-domain, we feed raw audio to dataset cl
 But in this example, all the data are converted to log-mel spectrogram in advance, as a major choice.
 
 - Good: This will make data handling easy, especially in training pipeline.
-- Bad: Data augmentation will be limited. Available transforations in torchaudio are: [FrequencyMasking](https://pytorch.org/audio/stable/transforms.html#frequencymasking) or [TimeMasking](https://pytorch.org/audio/stable/transforms.html#timemasking).
+- Bad: Applicable data augmentations will be limited. Available transformations in torchaudio are: [FrequencyMasking](https://pytorch.org/audio/stable/transforms.html#frequencymasking) or [TimeMasking](https://pytorch.org/audio/stable/transforms.html#timemasking).
 
 ### Input data size
 
