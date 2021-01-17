@@ -1,5 +1,5 @@
 # basic setting parameters
-clip_length: 1.0 # [sec]
+clip_length: 5.0 # [sec]
 
 # preprocessing parameters
 sample_rate: 44100
