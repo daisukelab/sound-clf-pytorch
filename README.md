@@ -71,7 +71,7 @@ Typical paramaters are configured in [config.yaml](config.yaml).
 How is the performance of the trained models on the tutorials?
 
 - The best Kaggle result MAP@3 was reported as 0.942 (see [Kaggle 4th solution](https://www.kaggle.com/c/freesound-audio-tagging/discussion/62634)). Note that this result is ensemble of 5 models of the same SE-ResNeXt network trained on 5 folds.
-- The best result is MAP@3 of 0.87 (with ResNetish). This is a single model result, without use of data augmentations.
+- The best result in this repo is MAP@3 of 0.87 (with ResNetish). This is a single model result, without use of data augmentations.
 
 Already came close to the top solution with ResNetish, and still have space for data augmentations/ regularization techniques.
 
