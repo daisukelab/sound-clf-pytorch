@@ -6,6 +6,9 @@ from src.libs import *
 import datetime
 from src.metric_fat2018 import eval_fat2018, eval_fat2018_by_probas
 from src.models import resnetish18, VGGish
+#from src.slack_bot import post_to_slack
+def post_to_slack(message):
+    print(message)
 
 
 def get_transforms(cfg):
@@ -19,7 +22,8 @@ def get_transforms(cfg):
             augs.append(AT.FrequencyMasking(NF//10))
             augs.append(AT.TimeMasking(NT//10))
         else:
-            raise Exception(f'unknown: {a}')
+            if a:
+                raise Exception(f'unknown: {a}')
     return VT.Compose(augs)
 
 
@@ -48,27 +52,33 @@ def read_metadata(cfg):
     return filenames, labels, classes
 
 
-def calc_stat(cfg, filenames, labels, classes, n_calc_stat=100): # TODO Incresase number
+def calc_stat(cfg, filenames, labels, classes, calc_stat=False, n_calc_stat=10000):
     print(labels)
     class_weight = compute_class_weight('balanced', range(len(classes)), labels['train'])
     class_weight = torch.tensor(class_weight).to(torch.float)
 
-    all_train_lms = np.hstack([np.load(f)[0] for f in filenames['train'][:n_calc_stat]])
-    train_mean_std = all_train_lms.mean(), all_train_lms.std()
-    print(train_mean_std)
+    if calc_stat:
+        all_train_lms = np.hstack([np.load(f)[0] for f in filenames['train'][:n_calc_stat]])
+        train_mean_std = all_train_lms.mean(), all_train_lms.std()
+        print(train_mean_std)
+    else:
+        train_mean_std = None
 
     return class_weight, train_mean_std
 
 
-def run(config_file='config-fat2018.yaml', epochs=None, ):
+def run(config_file='config-fat2018.yaml', epochs=None, mixup=None, aug=None, norm=False):
+    print(config_file, epochs, mixup, aug)
     cfg = load_config(config_file)
     cfg.epochs = epochs or cfg.epochs
+    cfg.mixup = cfg.mixup if mixup is None else mixup
+    cfg.aug = aug or cfg.aug or ''
     filenames, labels, classes = read_metadata(cfg)
-    class_weight, train_mean_std = calc_stat(cfg, filenames, labels, classes)
+    class_weight, train_mean_std = calc_stat(cfg, filenames, labels, classes, calc_stat=norm)
 
-    weight_folder = datetime.datetime.now().strftime('%y%m%d%H%M') 
-    weight_folder = f'work/model-{cfg.model}-{cfg.aug}-m{str(cfg.mixup)[2:]}-{weight_folder}'
-    weight_folder = Path(weight_folder)
+    name = datetime.datetime.now().strftime('%y%m%d%H%M')
+    name = f'model-{cfg.model}-{cfg.aug}-m{str(cfg.mixup)[2:]}{"-N" if norm else ""}-{name}'
+    weight_folder = Path('work/' + name)
     weight_folder.mkdir(parents=True, exist_ok=True)
     results, all_file_probas = [], []
     print(f'Training {weight_folder}')
@@ -111,7 +121,8 @@ def run(config_file='config-fat2018.yaml', epochs=None, ):
     mean_file_probas = np.array(all_file_probas).mean(axis=0)
     acc, MAP3 = eval_fat2018_by_probas(mean_file_probas, labels['test'], debug_name='test')
     np.save(weight_folder/'ens_probas.npy', mean_file_probas)
-    print('mean test acc:', np.mean(results))
+    report = f'{name},{epochs},{aug},{mixup},{norm},{acc},{np.mean(results)}'
+    post_to_slack(report)
 
 
 if __name__ == '__main__':
