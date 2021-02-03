@@ -67,10 +67,11 @@ def run(config_file='config-fat2018.yaml', epochs=None, ):
     class_weight, train_mean_std = calc_stat(cfg, filenames, labels, classes)
 
     weight_folder = datetime.datetime.now().strftime('%y%m%d%H%M') 
-    weight_folder = f'work/model-{cfg.model}-{cfg.aug}-{weight_folder}'
+    weight_folder = f'work/model-{cfg.model}-{cfg.aug}-m{str(cfg.mixup)[2:]}-{weight_folder}'
     weight_folder = Path(weight_folder)
     weight_folder.mkdir(parents=True, exist_ok=True)
     results, all_file_probas = [], []
+    print(f'Training {weight_folder}')
 
     test_dataset = LMSClfDataset(cfg, filenames['test'], labels['test'], norm_mean_std=train_mean_std)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=cfg.bs, pin_memory=True,
