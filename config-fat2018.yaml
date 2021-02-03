@@ -1,0 +1,21 @@
+# basic setting parameters
+clip_length: 5.0 # [sec]
+
+# preprocessing parameters
+sample_rate: 44100
+hop_length: 441
+n_fft: 2048
+n_mels: 128
+f_min: 0
+f_max: 22050
+
+# test parameters
+bs: 128
+mixup: 0.2
+n_folds: 5
+epochs: 100
+aug: RCxSA # RC: random resized crop, SA: spec augment
+model: R18 # R18: ResNetish18, VGG: VGGish
+
+# dataset configurations
+data_root: /data/A/2018fsd
