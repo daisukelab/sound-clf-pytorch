@@ -8,3 +8,5 @@ numpy
 jupyter
 pandas
 scikit-learn
+fire
+dl-cliche

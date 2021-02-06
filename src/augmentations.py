@@ -49,3 +49,6 @@ class GenericRandomResizedCrop():
         i, j, h, w = self.get_params(x, self.scale, self.ratio)
         x = x[:, j:j+w, i:i+h]
         return F.interpolate(x.unsqueeze(0), size=self.size, mode='bicubic', align_corners=True).squeeze(0)
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}(size={self.size}, scale={self.scale}, ratio={self.ratio})'

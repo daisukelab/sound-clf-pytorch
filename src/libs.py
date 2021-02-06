@@ -32,15 +32,16 @@ from dlcliche.utils import copy_file
 from src.augmentations import GenericRandomResizedCrop
 
 
-
 device = torch.device('cuda')
 
-def load_config(filename):
+
+def load_config(filename, debug=False):
     with open(filename) as conf:
         cfg = EasyDict(yaml.safe_load(conf))
     cfg.unit_length = int((cfg.clip_length * cfg.sample_rate + cfg.hop_length - 1) // cfg.hop_length)
     cfg.data_root = Path(cfg.data_root)
-    print(cfg)
+    if debug:
+        print(cfg)
     return cfg
 
 
@@ -73,8 +74,8 @@ class LMSClfDataset(torch.utils.data.Dataset):
         assert 0 <= index and index < len(self)
         
         log_mel_spec = np.load(self.filenames[index])
-        
-        # normalize - instance based
+
+        # Normalize
         if self.norm_mean_std is not None:
             log_mel_spec = (log_mel_spec - self.norm_mean_std[0]) / self.norm_mean_std[1]
 
@@ -99,16 +100,16 @@ class LMSClfDataset(torch.utils.data.Dataset):
 
 
 class SplitAllDataset(torch.utils.data.Dataset):
-    def __init__(self, cfg, df, normalize=False, top_n=99999):
-        self.df = df
-        self.normalize = normalize
+    def __init__(self, cfg, filenames, norm_mean_std=None, head_n=99999):
+        self.filenames = filenames
+        self.norm_mean_std = norm_mean_std
 
         # Calculate length of clip this dataset will make
         self.L = cfg.unit_length
 
         # Get # of splits for all files
-        self.n_splits = np.array([(np.load(f).shape[-1] + self.L - 1) // self.L for f in df.index.values])
-        self.n_splits = np.clip(1, top_n, self.n_splits) # limit number of splits.
+        self.n_splits = np.array([(np.load(f).shape[-1] + self.L - 1) // self.L for f in filenames])
+        self.n_splits = np.clip(1, head_n, self.n_splits) # limit number of splits.
         self.sum_splits = np.cumsum(self.n_splits)
 
     def __len__(self):
@@ -118,7 +119,7 @@ class SplitAllDataset(torch.utils.data.Dataset):
         return sum((index < self.sum_splits) == False)
 
     def filename(self, index):
-        return self.df.index.values[self.file_index(index)]
+        return self.filenames[self.file_index(index)]
 
     def split_index(self, index):
         fidx = self.file_index(index)
@@ -132,10 +133,9 @@ class SplitAllDataset(torch.utils.data.Dataset):
         start = self.split_index(index) * self.L
         log_mel_spec = log_mel_spec[..., start:start + self.L]
 
-        # normalize - instance based
-        if self.normalize:
-            _m, _s = log_mel_spec.mean(),  log_mel_spec.std() + np.finfo(np.float).eps
-            log_mel_spec = (log_mel_spec - _m) / _s
+        # Normalize
+        if self.norm_mean_std is not None:
+            log_mel_spec = (log_mel_spec - self.norm_mean_std[0]) / self.norm_mean_std[1]
 
         # Padding if sample is shorter than expected - both head & tail are filled with 0s
         pad_size = self.L - sample_length(log_mel_spec)

@@ -1,10 +1,17 @@
-"""
-Audio models based on VGGish [1] paper.
+"""Audio models based on VGGish [1] paper.
+
+## About
 
 Based on following implementations:
 
-- https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
+- https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py -- borrowed most of code from this torchvision implementation.
 - https://github.com/harritaylor/torchvggish
+
+## Disclaimer
+
+Tried to follow the original paper description, but there could be difference from the real ResNetish/VGGish.
+
+## References
 
 [1] S. Hershey et al., ‘CNN Architectures for Large-Scale Audio Classification’,\ in International Conference on Acoustics, Speech and Signal Processing (ICASSP),2017\ Available: https://arxiv.org/abs/1609.09430, https://ai.google/research/pubs/pub45611
 """
@@ -285,12 +292,11 @@ def resnetish50(num_classes: int, **kwargs: Any) -> ResNetish:
 
 
 class VGGish(nn.Module):
-    """
-    Mostly based on:
+    """Based on:
         https://github.com/harritaylor/torchvggish/blob/master/docs/_example_download_weights.ipynb
     """
 
-    def __init__(self, num_classes: int): #  Added num_classes
+    def __init__(self, num_classes: int): # Added num_classes
         super(VGGish, self).__init__()
         self.features = nn.Sequential(
             nn.Conv2d(1, 64, 3, 1, 1),
@@ -308,7 +314,7 @@ class VGGish(nn.Module):
             nn.ReLU(inplace=True),
             nn.Conv2d(512, 512, 3, 1, 1),
             nn.ReLU(inplace=True),
-            nn.AdaptiveMaxPool2d((4, 6))) # Replaced from MaxPool2d(2,2)
+            nn.AdaptiveMaxPool2d((4, 6))) # Replaced: MaxPool2d(2,2)
         self.embeddings = nn.Sequential(
             nn.Linear(512*24, 4096),
             nn.ReLU(inplace=True),
@@ -316,11 +322,56 @@ class VGGish(nn.Module):
             nn.ReLU(inplace=True),
             nn.Linear(4096, 128),
             nn.ReLU(inplace=True))
-        self.head = nn.Linear(128, num_classes) #  Added
+        self.head = nn.Linear(128, num_classes) # Added
             
     def forward(self, x):
         x = self.features(x)
         x = x.view(x.size(0),-1)
         x = self.embeddings(x)
         x = self.head(x) #  Added
+        return x
+
+
+class AlexNet(nn.Module):
+    """Based on https://github.com/pytorch/vision/blob/master/torchvision/models/alexnet.py
+    """
+
+    def __init__(self, num_classes: int = 1000) -> None:
+        super(AlexNet, self).__init__()
+        self.features = nn.Sequential(
+            nn.Conv2d(1, 64, kernel_size=11, stride=(1,2), padding=2), # Replaced 3-channel with 1, strid=4 with (1,2)
+            nn.BatchNorm2d(64), # Added according to the paper.
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(64, 192, kernel_size=5, padding=2),
+            nn.BatchNorm2d(192), # Added according to the paper.
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(192, 384, kernel_size=3, padding=1),
+            nn.BatchNorm2d(384), # Added according to the paper.
+            nn.ReLU(inplace=True),
+            nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            nn.BatchNorm2d(256), # Added according to the paper.
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            nn.BatchNorm2d(256), # Added according to the paper.
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+        )
+        self.avgpool = nn.AdaptiveAvgPool2d((4, 6)) # Replaced: n.AdaptiveAvgPool2d((6, 6))
+        self.classifier = nn.Sequential(
+            nn.Dropout(),
+            nn.Linear(256 * 4 * 6, 4096), # Replaced: 256 * 6 * 6
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(4096, 4096),
+            nn.ReLU(inplace=True),
+            nn.Linear(4096, num_classes),
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = self.features(x)
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
         return x
