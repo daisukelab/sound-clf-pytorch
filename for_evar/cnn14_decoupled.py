@@ -9,11 +9,10 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from torchlibrosa.stft import Spectrogram, LogmelFilterBank
-from evar.model_utils import initialize_layers
 
 
 class AudioFeatureExtractor(nn.Module):
-    def __init__(self, sample_rate, n_fft, n_mels, hop_length, win_length, f_min, f_max):
+    def __init__(self, sample_rate=16000, n_fft=512, n_mels=64, hop_length=160, win_length=512, f_min=50, f_max=8000):
         super().__init__()
 
         # Spectrogram extractor
@@ -30,6 +29,24 @@ class AudioFeatureExtractor(nn.Module):
         x = self.spectrogram_extractor(batch_audio) # (B, 1, T, F(freq_bins))
         x = self.logmel_extractor(x)                # (B, 1, T, F(mel_bins))
         return x
+
+
+def initialize_layers(layer):
+    # initialize all childrens first.
+    for l in layer.children():
+        initialize_layers(l)
+
+    # initialize only linaer
+    if type(layer) != nn.Linear:
+        return
+
+    # Thanks to https://github.com/qiuqiangkong/audioset_tagging_cnn/blob/d2f4b8c18eab44737fcc0de1248ae21eb43f6aa4/pytorch/models.py#L10
+    logging.debug(f' initialize {layer}.weight')
+    nn.init.xavier_uniform_(layer.weight)
+    if hasattr(layer, 'bias'):
+        if layer.bias is not None:
+            logging.debug(f' initialize {layer}.bias')
+            layer.bias.data.fill_(0.)
 
 
 def init_bn(bn):
