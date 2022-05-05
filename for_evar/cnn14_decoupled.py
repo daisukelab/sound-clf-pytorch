@@ -41,11 +41,9 @@ def initialize_layers(layer):
         return
 
     # Thanks to https://github.com/qiuqiangkong/audioset_tagging_cnn/blob/d2f4b8c18eab44737fcc0de1248ae21eb43f6aa4/pytorch/models.py#L10
-    logging.debug(f' initialize {layer}.weight')
     nn.init.xavier_uniform_(layer.weight)
     if hasattr(layer, 'bias'):
         if layer.bias is not None:
-            logging.debug(f' initialize {layer}.bias')
             layer.bias.data.fill_(0.)
 
 
